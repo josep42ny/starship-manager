@@ -1,11 +1,13 @@
 package com.w2m.starshipmanager.controller;
 
 import com.w2m.starshipmanager.model.starship.StarshipCreateRequest;
+import com.w2m.starshipmanager.model.starship.StarshipModifyRequest;
 import com.w2m.starshipmanager.model.starship.StarshipResponse;
 import com.w2m.starshipmanager.service.StarshipService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,15 +38,30 @@ public class StarshipController {
     }
 
     @PostMapping("/starships")
-    public ResponseEntity<StarshipResponse> create(
+    public ResponseEntity<?> create(
             @NotNull @Valid @RequestBody final StarshipCreateRequest request
     ) {
-        StarshipResponse response = this.starshipService.create(request);
+        final StarshipResponse response = this.starshipService.create(request);
 
-        long id = response.getId();
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(id).toUri();
+        final long id = response.getId();
+        final URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(id)
+                .toUri();
 
         return ResponseEntity.created(location).build();
+    }
+
+    @PatchMapping("/starships/{id}")
+    public ResponseEntity<?> modify(
+            @PathVariable @Positive final Long id,
+            @Valid @RequestBody final StarshipModifyRequest request
+    ) {
+        final StarshipResponse response = this.starshipService.edit(id, request);
+
+        final String location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString();
+
+        return ResponseEntity.ok().header("Location", location).body(response);
     }
 
 

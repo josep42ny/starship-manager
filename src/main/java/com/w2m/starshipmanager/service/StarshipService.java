@@ -2,8 +2,11 @@ package com.w2m.starshipmanager.service;
 
 import com.w2m.starshipmanager.data.model.Starship;
 import com.w2m.starshipmanager.data.repository.StarshipRepository;
+import com.w2m.starshipmanager.exception.StarshipNotFoundException;
 import com.w2m.starshipmanager.model.starship.StarshipCreateRequest;
+import com.w2m.starshipmanager.model.starship.StarshipModifyRequest;
 import com.w2m.starshipmanager.model.starship.StarshipResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,10 +30,22 @@ public class StarshipService {
         );
     }
 
+    @Transactional
     public StarshipResponse create(final StarshipCreateRequest request) {
         final Starship starshipToSave = this.mapToNewStarship(request);
         final Starship response = this.starshipRepository.save(starshipToSave);
         return this.objectMapper.convertValue(response, StarshipResponse.class);
+    }
+
+    @Transactional
+    public StarshipResponse edit(final long id, final StarshipModifyRequest request) {
+        final Starship starshipToEdit = this.starshipRepository.findById(id)
+                .orElseThrow(() -> new StarshipNotFoundException("Starship with id " + id + " not found"));
+
+        this.objectMapper.updateValue(starshipToEdit, request);
+        this.starshipRepository.save(starshipToEdit);
+
+        return this.objectMapper.convertValue(starshipToEdit, StarshipResponse.class);
     }
 
     private Starship mapToNewStarship(final StarshipCreateRequest request) {
@@ -42,6 +57,4 @@ public class StarshipService {
                 .updatedAt(LocalDateTime.now())
                 .build();
     }
-
-
 }
