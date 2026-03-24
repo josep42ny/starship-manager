@@ -71,5 +71,14 @@ public class StarshipController {
         return ResponseEntity.ok().header("Location", location).body(starshipResponse);
     }
 
+    @DeleteMapping("/starships/{id}")
+    public ResponseEntity<?> delete(
+            @Positive @PathVariable final Long id
+    ) {
+        starshipService.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

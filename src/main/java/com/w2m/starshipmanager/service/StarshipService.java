@@ -30,11 +30,11 @@ public class StarshipService {
         );
     }
 
-    public StarshipResponse getById(Long id) {
-        Starship starship = starshipRepository.findById(id)
+    public StarshipResponse getById(final Long id) {
+        final Starship starship = this.starshipRepository.findById(id)
                 .orElseThrow(() -> new StarshipNotFoundException("Starship with id " + id + " not found"));
 
-        return objectMapper.convertValue(starship, StarshipResponse.class);
+        return this.objectMapper.convertValue(starship, StarshipResponse.class);
     }
 
     @Transactional
@@ -63,5 +63,13 @@ public class StarshipService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void delete(final Long id) {
+        if (!this.starshipRepository.existsById(id)) {
+            throw new StarshipNotFoundException("Starship with id " + id + " not found");
+        }
+        
+        this.starshipRepository.deleteById(id);
     }
 }
