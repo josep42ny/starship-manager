@@ -30,6 +30,13 @@ public class StarshipService {
         );
     }
 
+    public StarshipResponse getById(Long id) {
+        Starship starship = starshipRepository.findById(id)
+                .orElseThrow(() -> new StarshipNotFoundException("Starship with id " + id + " not found"));
+
+        return objectMapper.convertValue(starship, StarshipResponse.class);
+    }
+
     @Transactional
     public StarshipResponse create(final StarshipCreateRequest request) {
         final Starship starshipToSave = this.mapToNewStarship(request);

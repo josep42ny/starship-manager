@@ -33,17 +33,24 @@ public class StarshipController {
             @Min(0) @RequestParam(defaultValue = "10") final int size
     ) {
         final Page<StarshipResponse> starshipsDto = this.starshipService.getAll(PageRequest.of(page, size));
-
         return ResponseEntity.ok(starshipsDto);
+    }
+
+    @GetMapping("/starships/{id}")
+    public ResponseEntity<StarshipResponse> getOneById(
+            @Positive @PathVariable final Long id
+    ) {
+        final StarshipResponse starshipResponse = this.starshipService.getById(id);
+        return ResponseEntity.ok(starshipResponse);
     }
 
     @PostMapping("/starships")
     public ResponseEntity<?> create(
             @NotNull @Valid @RequestBody final StarshipCreateRequest request
     ) {
-        final StarshipResponse response = this.starshipService.create(request);
+        final StarshipResponse starshipResponse = this.starshipService.create(request);
 
-        final long id = response.getId();
+        final long id = starshipResponse.getId();
         final URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(id)
@@ -54,14 +61,14 @@ public class StarshipController {
 
     @PatchMapping("/starships/{id}")
     public ResponseEntity<?> modify(
-            @PathVariable @Positive final Long id,
+            @Positive @PathVariable final Long id,
             @Valid @RequestBody final StarshipModifyRequest request
     ) {
-        final StarshipResponse response = this.starshipService.edit(id, request);
+        final StarshipResponse starshipResponse = this.starshipService.edit(id, request);
 
         final String location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString();
 
-        return ResponseEntity.ok().header("Location", location).body(response);
+        return ResponseEntity.ok().header("Location", location).body(starshipResponse);
     }
 
 
