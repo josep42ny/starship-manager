@@ -1,4 +1,4 @@
-package com.w2m.starshipmanager.model;
+package com.w2m.starshipmanager.data.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
