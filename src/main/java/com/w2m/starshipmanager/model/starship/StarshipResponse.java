@@ -1,41 +1,29 @@
-package com.w2m.starshipmanager.data.model;
+package com.w2m.starshipmanager.model.starship;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
 @Data
-@Entity
-@Table(name = "starship")
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class Starship {
+public class StarshipResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "length")
     private Double length;
 
-    @Column(name = "beam")
     private Double beam;
 
-    @Column(name = "created_at")
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
