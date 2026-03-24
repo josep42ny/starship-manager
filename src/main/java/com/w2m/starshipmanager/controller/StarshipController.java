@@ -27,9 +27,9 @@ public class StarshipController {
             @PositiveOrZero @RequestParam(defaultValue = "0") final int page,
             @Min(0) @RequestParam(defaultValue = "10") final int size
     ) {
-        final Page<StarshipDto> starshipDtos = this.starshipService.getAll(PageRequest.of(page, size));
+        final Page<StarshipDto> starshipsDto = this.starshipService.getAll(PageRequest.of(page, size));
 
-        return ResponseEntity.ok(starshipDtos);
+        return ResponseEntity.ok(starshipsDto);
     }
 
 }
