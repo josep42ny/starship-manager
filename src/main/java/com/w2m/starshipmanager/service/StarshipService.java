@@ -45,7 +45,9 @@ public class StarshipService {
     @Transactional
     public StarshipResponse create(final StarshipCreateRequest request) {
         final Starship starshipToSave = this.mapToNewStarship(request);
-        final Starship savedStarship = this.starshipRepository.save(starshipToSave);
+
+        final Starship savedStarship = this.starshipRepository.saveAndFlush(starshipToSave);
+
         return this.mapToResponse(savedStarship);
     }
 
@@ -56,7 +58,7 @@ public class StarshipService {
                 .orElseThrow(() -> new StarshipNotFoundException("Starship with id " + id + " not found"));
 
         this.objectMapper.updateValue(starshipToEdit, request);
-        final Starship editedStarship = this.starshipRepository.save(starshipToEdit);
+        final Starship editedStarship = this.starshipRepository.saveAndFlush(starshipToEdit);
 
         return this.mapToResponse(editedStarship);
     }

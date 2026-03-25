@@ -6,9 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +17,6 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 public class Starship {
 
     @Id
@@ -36,12 +34,12 @@ public class Starship {
 
     @JsonProperty("created_at")
     @Column(name = "created_at", nullable = false)
-    @CreatedDate
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @JsonProperty("updated_at")
     @Column(name = "updated_at", nullable = false)
-    @LastModifiedDate
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
 }
