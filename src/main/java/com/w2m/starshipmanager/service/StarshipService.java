@@ -54,6 +54,7 @@ public class StarshipService {
                 .orElseThrow(() -> new StarshipNotFoundException("Starship with id " + id + " not found"));
 
         this.objectMapper.updateValue(starshipToEdit, request);
+        starshipToEdit.setUpdatedAt(LocalDateTime.now());
         this.starshipRepository.save(starshipToEdit);
 
         return this.objectMapper.convertValue(starshipToEdit, StarshipResponse.class);
