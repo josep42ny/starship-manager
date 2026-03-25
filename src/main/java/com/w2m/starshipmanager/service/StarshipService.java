@@ -15,8 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class StarshipService {
@@ -33,9 +31,7 @@ public class StarshipService {
             starshipsToMap = this.starshipRepository.findAllByNameContainingIgnoreCase(pageRequest, nameSearch);
         }
 
-        return starshipsToMap.map(starship ->
-                this.objectMapper.convertValue(starship, StarshipResponse.class)
-        );
+        return starshipsToMap.map(this::mapToResponse);
     }
 
     @Cacheable(value = "starships", key = "#id")
@@ -43,14 +39,14 @@ public class StarshipService {
         final Starship starship = this.starshipRepository.findById(id)
                 .orElseThrow(() -> new StarshipNotFoundException("Starship with id " + id + " not found"));
 
-        return this.objectMapper.convertValue(starship, StarshipResponse.class);
+        return this.mapToResponse(starship);
     }
 
     @Transactional
     public StarshipResponse create(final StarshipCreateRequest request) {
         final Starship starshipToSave = this.mapToNewStarship(request);
-        final Starship response = this.starshipRepository.save(starshipToSave);
-        return this.objectMapper.convertValue(response, StarshipResponse.class);
+        final Starship savedStarship = this.starshipRepository.save(starshipToSave);
+        return this.mapToResponse(savedStarship);
     }
 
     @CacheEvict(value = "starships", key = "#id")
@@ -60,10 +56,9 @@ public class StarshipService {
                 .orElseThrow(() -> new StarshipNotFoundException("Starship with id " + id + " not found"));
 
         this.objectMapper.updateValue(starshipToEdit, request);
-        starshipToEdit.setUpdatedAt(LocalDateTime.now());
-        this.starshipRepository.save(starshipToEdit);
+        final Starship editedStarship = this.starshipRepository.save(starshipToEdit);
 
-        return this.objectMapper.convertValue(starshipToEdit, StarshipResponse.class);
+        return this.mapToResponse(editedStarship);
     }
 
     @CacheEvict(value = "starships", key = "#id")
@@ -80,8 +75,13 @@ public class StarshipService {
                 .name(request.getName())
                 .length(request.getLength())
                 .beam(request.getBeam())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
                 .build();
+    }
+
+    private StarshipResponse mapToResponse(final Starship entity) {
+        final StarshipResponse response = this.objectMapper.convertValue(entity, StarshipResponse.class);
+        response.setCreatedAt(entity.getCreatedAt());
+        response.setUpdatedAt(entity.getUpdatedAt());
+        return response;
     }
 }
