@@ -75,7 +75,7 @@ public class StarshipController {
     public ResponseEntity<?> delete(
             @Positive @PathVariable final Long id
     ) {
-        starshipService.delete(id);
+        this.starshipService.delete(id);
 
         return ResponseEntity.noContent().build();
     }

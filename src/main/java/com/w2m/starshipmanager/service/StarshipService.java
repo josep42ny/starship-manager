@@ -8,6 +8,8 @@ import com.w2m.starshipmanager.model.starship.StarshipModifyRequest;
 import com.w2m.starshipmanager.model.starship.StarshipResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class StarshipService {
         );
     }
 
+    @Cacheable(value = "starships", key = "#id")
     public StarshipResponse getById(final Long id) {
         final Starship starship = this.starshipRepository.findById(id)
                 .orElseThrow(() -> new StarshipNotFoundException("Starship with id " + id + " not found"));
@@ -44,6 +47,7 @@ public class StarshipService {
         return this.objectMapper.convertValue(response, StarshipResponse.class);
     }
 
+    @CacheEvict(value = "starships", key = "#id")
     @Transactional
     public StarshipResponse edit(final long id, final StarshipModifyRequest request) {
         final Starship starshipToEdit = this.starshipRepository.findById(id)
@@ -55,6 +59,15 @@ public class StarshipService {
         return this.objectMapper.convertValue(starshipToEdit, StarshipResponse.class);
     }
 
+    @CacheEvict(value = "starships", key = "#id")
+    public void delete(final Long id) {
+        if (!this.starshipRepository.existsById(id)) {
+            throw new StarshipNotFoundException("Starship with id " + id + " not found");
+        }
+
+        this.starshipRepository.deleteById(id);
+    }
+
     private Starship mapToNewStarship(final StarshipCreateRequest request) {
         return Starship.builder()
                 .name(request.getName())
@@ -63,13 +76,5 @@ public class StarshipService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-    }
-
-    public void delete(final Long id) {
-        if (!this.starshipRepository.existsById(id)) {
-            throw new StarshipNotFoundException("Starship with id " + id + " not found");
-        }
-        
-        this.starshipRepository.deleteById(id);
     }
 }
