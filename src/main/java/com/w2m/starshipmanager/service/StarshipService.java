@@ -24,8 +24,14 @@ public class StarshipService {
     private final ObjectMapper objectMapper;
     private final StarshipRepository starshipRepository;
 
-    public Page<StarshipResponse> getAll(final PageRequest pageRequest) {
-        final Page<Starship> starshipsToMap = this.starshipRepository.findAll(pageRequest);
+    public Page<StarshipResponse> getAll(final PageRequest pageRequest, final String nameSearch) {
+        final Page<Starship> starshipsToMap;
+
+        if (nameSearch == null || nameSearch.isBlank()) {
+            starshipsToMap = this.starshipRepository.findAll(pageRequest);
+        } else {
+            starshipsToMap = this.starshipRepository.findAllByNameContainingIgnoreCase(pageRequest, nameSearch);
+        }
 
         return starshipsToMap.map(starship ->
                 this.objectMapper.convertValue(starship, StarshipResponse.class)

@@ -30,9 +30,10 @@ public class StarshipController {
     @GetMapping("/starships")
     public ResponseEntity<Page<StarshipResponse>> getAll(
             @PositiveOrZero @RequestParam(defaultValue = "0") final int page,
-            @Min(0) @RequestParam(defaultValue = "10") final int size
+            @Min(0) @RequestParam(defaultValue = "10") final int size,
+            @RequestParam(defaultValue = "") final String name
     ) {
-        final Page<StarshipResponse> starshipsDto = this.starshipService.getAll(PageRequest.of(page, size));
+        final Page<StarshipResponse> starshipsDto = this.starshipService.getAll(PageRequest.of(page, size), name);
         return ResponseEntity.ok(starshipsDto);
     }
 
