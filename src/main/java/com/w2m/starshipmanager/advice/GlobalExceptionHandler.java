@@ -2,6 +2,7 @@ package com.w2m.starshipmanager.advice;
 
 import com.w2m.starshipmanager.exception.ConflictingUserNameException;
 import com.w2m.starshipmanager.exception.StarshipNotFoundException;
+import com.w2m.starshipmanager.exception.UserNameNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -18,30 +19,35 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     public ProblemDetail handleStarshipNotFound(final StarshipNotFoundException exception) {
-        return buildGenericProblemDetail(HttpStatus.NOT_FOUND, exception);
+        return this.buildGenericProblemDetail(HttpStatus.NOT_FOUND, exception);
     }
 
     @ExceptionHandler
     public ProblemDetail handleUsernameNotFound(final UsernameNotFoundException exception){
-        return buildGenericProblemDetail(HttpStatus.NOT_FOUND, exception);
+        return this.buildGenericProblemDetail(HttpStatus.NOT_FOUND, exception);
+    }
+
+    @ExceptionHandler
+    public ProblemDetail handleUserNameNotFound(final UserNameNotFoundException exception) {
+        return this.buildGenericProblemDetail(HttpStatus.BAD_REQUEST, exception);
     }
 
     @ExceptionHandler
     public ProblemDetail handleConstraintViolation(final ConstraintViolationException exception) {
-        return buildGenericProblemDetail(HttpStatus.BAD_REQUEST, exception);
+        return this.buildGenericProblemDetail(HttpStatus.BAD_REQUEST, exception);
     }
 
     @ExceptionHandler
     public ProblemDetail handleBadCredentials(final BadCredentialsException exception) {
-        return buildGenericProblemDetail(HttpStatus.BAD_REQUEST, exception);
+        return this.buildGenericProblemDetail(HttpStatus.BAD_REQUEST, exception);
     }
 
     @ExceptionHandler
-    public ProblemDetail handleConflictingUserNameException(final ConflictingUserNameException exception) {
-        return buildGenericProblemDetail(HttpStatus.BAD_REQUEST, exception);
+    public ProblemDetail handleConflictingUserName(final ConflictingUserNameException exception) {
+        return this.buildGenericProblemDetail(HttpStatus.BAD_REQUEST, exception);
     }
 
-    private ProblemDetail buildGenericProblemDetail(HttpStatus httpStatus, Exception exception) {
+    private ProblemDetail buildGenericProblemDetail(final HttpStatus httpStatus, final Exception exception) {
         final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(httpStatus, exception.getMessage());
         problemDetail.setProperty("timestamp", LocalDateTime.now());
         return problemDetail;

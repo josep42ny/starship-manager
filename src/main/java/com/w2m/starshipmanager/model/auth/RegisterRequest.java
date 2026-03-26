@@ -15,6 +15,6 @@ public class RegisterRequest {
     private String password;
 
     @Setter(AccessLevel.NONE)
-    private String role = "ROLE_USER";
+    private String role = "USER";
 
 }

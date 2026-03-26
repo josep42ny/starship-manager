@@ -1,7 +1,7 @@
 package com.w2m.starshipmanager.filter;
 
 import com.w2m.starshipmanager.data.model.JwtPrincipal;
-import com.w2m.starshipmanager.util.JwtUtils;
+import com.w2m.starshipmanager.service.JwtService;
 import io.jsonwebtoken.JwtException;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
@@ -23,6 +23,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private final JwtService jwtService;
+
     @Override
     protected void doFilterInternal(
             @Nonnull final HttpServletRequest request,
@@ -38,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String jwt = authHeader.substring(7);
-            final JwtPrincipal principal = JwtUtils.parseAndValidate(jwt);
+            final JwtPrincipal principal = jwtService.parseAndValidate(jwt);
 
             final var authorities = principal.roles().stream()
                     .map(SimpleGrantedAuthority::new)

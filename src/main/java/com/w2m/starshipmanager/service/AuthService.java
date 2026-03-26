@@ -4,7 +4,6 @@ import com.w2m.starshipmanager.data.model.User;
 import com.w2m.starshipmanager.data.repository.UserRepository;
 import com.w2m.starshipmanager.exception.ConflictingUserNameException;
 import com.w2m.starshipmanager.model.auth.RegisterRequest;
-import com.w2m.starshipmanager.util.JwtUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,8 +16,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-    UserDetailsServiceImpl userDetailsService;
-    UserRepository userRepository;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     public String login(final String username, final String password) {
         final UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
@@ -27,7 +27,7 @@ public class AuthService {
             throw new BadCredentialsException("Wrong credentials for user: " + username);
         }
 
-        return JwtUtils.generateAccessToken(userDetails);
+        return jwtService.generateAccessToken(userDetails);
     }
 
     @Transactional
@@ -43,9 +43,9 @@ public class AuthService {
                 .role(request.getRole())
                 .build();
 
-        final User savedUser = this.userRepository.saveAndFlush(userToSave);
+        this.userRepository.save(userToSave);
 
-        return this.login(savedUser.getUsername(), savedUser.getPassword());
+        return this.login(request.getUsername(), request.getPassword());
     }
 
     private String hashPassword(final String plaintext) {
