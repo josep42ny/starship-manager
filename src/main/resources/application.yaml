@@ -10,3 +10,9 @@ spring:
         username: root
         password: 1234
         driverClassName: org.h2.Driver
+
+sm:
+    jwt:
+        expiration: ${JWT_EXPIRATION}
+        issuer: ${JWT_ISSUER}
+        secret: ${JWT_SECRET}
