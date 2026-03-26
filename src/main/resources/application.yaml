@@ -2,16 +2,11 @@ spring:
     application:
         name: starship-manager
 
+    profiles:
+        active: tst
+
     datasource:
         url: jdbc:h2:mem:starships
         username: root
         password: 1234
         driverClassName: org.h2.Driver
-
-    h2:
-        console:
-            enabled: true
-
-logging:
-    level:
-        org.springframework.cache: TRACE
