@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "starship")
+@Table(name = "starships")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
