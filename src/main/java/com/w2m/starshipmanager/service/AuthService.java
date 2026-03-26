@@ -3,7 +3,7 @@ package com.w2m.starshipmanager.service;
 import com.w2m.starshipmanager.data.model.User;
 import com.w2m.starshipmanager.data.repository.UserRepository;
 import com.w2m.starshipmanager.exception.ConflictingUserNameException;
-import com.w2m.starshipmanager.model.user.UserRegisterRequest;
+import com.w2m.starshipmanager.model.auth.RegisterRequest;
 import com.w2m.starshipmanager.util.JwtUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class AuthService {
     public String login(final String username, final String password) {
         final UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-        if (!passwordMatches(password, userDetails.getPassword())) {
+        if (!this.passwordMatches(password, userDetails.getPassword())) {
             throw new BadCredentialsException("Wrong credentials for user: " + username);
         }
 
@@ -31,28 +31,28 @@ public class AuthService {
     }
 
     @Transactional
-    public String register(UserRegisterRequest request) throws UsernameNotFoundException {
-        boolean userExists = userRepository.existsUserByUsername(request.getUsername());
+    public String register(final RegisterRequest request) throws UsernameNotFoundException {
+        final boolean userExists = this.userRepository.existsUserByUsername(request.getUsername());
         if (userExists) {
             throw new ConflictingUserNameException("Username is already taken: " + request.getUsername());
         }
 
-        User userToSave = User.builder()
+        final User userToSave = User.builder()
                 .username(request.getUsername())
-                .password(hashPassword(request.getPassword()))
+                .password(this.hashPassword(request.getPassword()))
                 .role(request.getRole())
                 .build();
 
-        User savedUser = userRepository.saveAndFlush(userToSave);
+        final User savedUser = this.userRepository.saveAndFlush(userToSave);
 
-        return login(savedUser.getUsername(), savedUser.getPassword());
+        return this.login(savedUser.getUsername(), savedUser.getPassword());
     }
 
-    private String hashPassword(String plaintext) {
+    private String hashPassword(final String plaintext) {
         return BCrypt.hashpw(plaintext, BCrypt.gensalt());
     }
 
-    private boolean passwordMatches(String plaintext, String ciphertext) {
+    private boolean passwordMatches(final String plaintext, final String ciphertext) {
         return BCrypt.checkpw(plaintext, ciphertext);
     }
 
