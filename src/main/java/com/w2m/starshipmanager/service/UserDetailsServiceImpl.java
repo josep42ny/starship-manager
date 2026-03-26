@@ -1,4 +1,4 @@
-package com.w2m.starshipmanager.util;
+package com.w2m.starshipmanager.service;
 
 import com.w2m.starshipmanager.data.model.User;
 import com.w2m.starshipmanager.data.repository.UserRepository;

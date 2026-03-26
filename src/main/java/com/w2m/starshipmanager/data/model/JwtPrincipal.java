@@ -1,4 +1,4 @@
-package com.w2m.starshipmanager.util;
+package com.w2m.starshipmanager.data.model;
 
 import java.util.List;
 

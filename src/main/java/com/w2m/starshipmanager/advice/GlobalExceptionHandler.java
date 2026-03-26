@@ -1,9 +1,11 @@
 package com.w2m.starshipmanager.advice;
 
+import com.w2m.starshipmanager.exception.ConflictingUserNameException;
 import com.w2m.starshipmanager.exception.StarshipNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,6 +28,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     public ProblemDetail handleConstraintViolation(final ConstraintViolationException exception) {
+        return buildGenericProblemDetail(HttpStatus.BAD_REQUEST, exception);
+    }
+
+    @ExceptionHandler
+    public ProblemDetail handleBadCredentials(final BadCredentialsException exception) {
+        return buildGenericProblemDetail(HttpStatus.BAD_REQUEST, exception);
+    }
+
+    @ExceptionHandler
+    public ProblemDetail handleConflictingUserNameException(final ConflictingUserNameException exception) {
         return buildGenericProblemDetail(HttpStatus.BAD_REQUEST, exception);
     }
 

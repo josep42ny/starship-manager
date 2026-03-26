@@ -1,5 +1,6 @@
 package com.w2m.starshipmanager.util;
 
+import com.w2m.starshipmanager.data.model.JwtPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -19,55 +20,55 @@ import java.util.stream.Collectors;
 public class JwtUtils {
 
     @Value("${sm.jwt.secret}")
-    private String jwtSecret;
+    private static String jwtSecret;
 
     @Value("${sm.jwt.expiration}")
-    private long jwtExpiration;
+    private static long jwtExpiration;
 
     @Value("${sm.jwt.issuer}")
-    private String jwtIssuer;
+    private static String jwtIssuer;
 
-    public String generateAccessToken(final UserDetails userDetails) {
+    public static String generateAccessToken(final UserDetails userDetails) {
         final Map<String, Object> claims = new HashMap<>();
 
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
 
-        return this.buildToken(claims, userDetails.getUsername(), this.jwtExpiration);
+        return buildToken(claims, userDetails.getUsername(), jwtExpiration);
     }
 
-    private String buildToken(final Map<String, Object> claims, final String subject, final long expiration) {
+    private static String buildToken(final Map<String, Object> claims, final String subject, final long expiration) {
         return Jwts.builder()
                 .claims(claims)
-                .issuer(this.jwtIssuer)
+                .issuer(jwtIssuer)
                 .subject(subject)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(this.getSigningKey())
+                .signWith(getSigningKey())
                 .compact();
     }
 
-    public JwtPrincipal parseAndValidate(final String token) throws JwtException {
+    public static JwtPrincipal parseAndValidate(final String token) throws JwtException {
         final Claims claims = Jwts.parser()
-                .verifyWith(this.getSigningKey())
+                .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
 
-        this.validateIssuer(claims);
+        validateIssuer(claims);
 
-        return new JwtPrincipal(this.validateUsername(claims), this.validateRoles(claims));
+        return new JwtPrincipal(validateUsername(claims), validateRoles(claims));
     }
 
-    private List<String> validateRoles(final Claims claims) {
+    private static List<String> validateRoles(final Claims claims) {
         final List<?> rawRoles = claims.get("roles", List.class);
         return (rawRoles == null)
                 ? List.of()
                 : rawRoles.stream().map(String::valueOf).toList();
     }
 
-    private String validateUsername(final Claims claims) {
+    private static String validateUsername(final Claims claims) {
         final String username = claims.getSubject();
         if (username == null || username.isBlank()) {
             throw new JwtException("Missing token subject");
@@ -75,15 +76,15 @@ public class JwtUtils {
         return username;
     }
 
-    private void validateIssuer(final Claims claims) {
+    private static void validateIssuer(final Claims claims) {
         final String tokenIssuer = claims.getIssuer();
-        if (tokenIssuer == null || !tokenIssuer.equals(this.jwtIssuer)) {
+        if (tokenIssuer == null || !tokenIssuer.equals(jwtIssuer)) {
             throw new JwtException("Invalid token issuer");
         }
     }
 
-    private SecretKey getSigningKey() {
-        final byte[] keyBytes = Decoders.BASE64.decode(this.jwtSecret);
+    private static SecretKey getSigningKey() {
+        final byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
