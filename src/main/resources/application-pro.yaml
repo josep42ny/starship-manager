@@ -1,9 +1,13 @@
 spring:
     datasource:
-        url: ${MARIADB_URL}
-        username: ${MARIADB_USER}
-        password: ${MARIADB_PASSWORD}
-        driver-class-name: org.mariadb.jdbc.Driver
+        url: jdbc:h2:mem:starships
+        username: root
+        password: 1234
+        driverClassName: org.h2.Driver
+    #        url: ${MARIADB_URL}
+    #        username: ${MARIADB_USER}
+    #        password: ${MARIADB_PASSWORD}
+    #        driver-class-name: org.mariadb.jdbc.Driver
 
     flyway:
         enabled: true
